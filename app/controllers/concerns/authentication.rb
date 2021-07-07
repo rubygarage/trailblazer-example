@@ -10,7 +10,7 @@ module Authentication
   end
 
   def authorize_request!
-    @auth_payload = JSON.parse(request.headers["Authorization"] || '')
+    @auth_payload = JSON.parse(request.headers['Authorization'] || '')
     raise UnauthorizedError if @auth_payload['user_id'].blank?
   rescue JSON::ParserError
     raise UnauthorizedError
@@ -27,7 +27,9 @@ module Authentication
   def exception_respond(status, message)
     errors = { base: [message] }
 
-    render json: { errors: errors }, status: status
+    render jsonapi_errors: errors,
+           class: { Hash: Lib::Representer::HashErrorsSerializer },
+           status: status
   end
 
   class UnauthorizedError < StandardError; end
